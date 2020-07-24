@@ -20,6 +20,7 @@ public class Rocket : MonoBehaviour
 
     enum State { Alive, Dying, Trascending }
     State state = State.Alive;
+    bool isCollisionEnabled = true;
 
     private void Start()
     {
@@ -34,6 +35,19 @@ public class Rocket : MonoBehaviour
         {
             RespondToThrustInput();
             RespondToRotateInput();
+            RespondToDebugKeys();
+        }
+    }
+
+    private void RespondToDebugKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            LoadNextScene();
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            isCollisionEnabled = !isCollisionEnabled;
         }
     }
 
@@ -86,19 +100,22 @@ public class Rocket : MonoBehaviour
     {
         if (state != State.Alive) { return; }
 
-        rigidBody.freezeRotation = true;
-        switch (collision.gameObject.tag)
+        if (isCollisionEnabled)
         {
-            case "Friendly":
-                break;
-            case "Finish":
-                StartSuccessSequence();
-                break;
-            default:
-                StartDeathSequence();
-                break;
+            rigidBody.freezeRotation = true;
+            switch (collision.gameObject.tag)
+            {
+                case "Friendly":
+                    break;
+                case "Finish":
+                    StartSuccessSequence();
+                    break;
+                default:
+                    StartDeathSequence();
+                    break;
+            }
+            rigidBody.freezeRotation = false;
         }
-        rigidBody.freezeRotation = false;
     }
 
     private void StartSuccessSequence()
